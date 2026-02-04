@@ -5,6 +5,7 @@
             "runtime": "vercel-php@0.7.1"
         }
     },
+    "installCommand": "cd backend && composer install --no-dev --optimize-autoloader",
     "routes": [
         {
             "src": "/public/(.*)",

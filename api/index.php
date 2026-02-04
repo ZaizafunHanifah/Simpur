@@ -1,31 +1,19 @@
 <?php
 
-$backendPath = __DIR__ . '/../backend';
-$vendorPath = $backendPath . '/vendor';
+// Vercel PHP entry point
+// Routes all requests to the backend Laravel application
 
-// Ensure dependencies are installed
-if (!file_exists($vendorPath . '/autoload.php')) {
-    // Try to run composer install if composer exists
-    $composerPaths = [
-        '/usr/local/bin/composer',
-        'composer',
-        'php -r "require phar://composer.phar/src/bootstrap.php;"'
-    ];
-    
-    foreach ($composerPaths as $cmd) {
-        if (shell_exec("which composer 2>/dev/null")) {
-            shell_exec("cd $backendPath && composer install --no-dev --optimize-autoloader 2>&1");
-            break;
-        }
-    }
-}
+$backendPath = realpath(__DIR__ . '/../backend');
 
-// Load Composer autoloader
-require_once $vendorPath . '/autoload.php';
+// Create kernel and handle request
+$app = require $backendPath . '/bootstrap/app.php';
 
-// Set environment variables
-putenv('APP_ENV=production');
-putenv('APP_DEBUG=false');
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-// Load Laravel application
-require $backendPath . '/bootstrap/app.php';
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);

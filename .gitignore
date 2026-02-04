@@ -1,0 +1,17 @@
+*.log
+.env
+.env.local
+.env.*.local
+.DS_Store
+/node_modules/
+/dist/
+/build/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.env.production
+backend/storage/
+frontend/storage/
+
