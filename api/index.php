@@ -3,7 +3,7 @@
  * Vercel Bridge for Laravel 11/12
  */
 
-// 1. Error Reporting (Debug Mode)
+// 1. Error Reporting
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -19,27 +19,28 @@ try {
     }
     require $root . '/vendor/autoload.php';
 
-    // 4. Environment Overrides
+    // 4. Set Environment
     $_ENV['APP_BASE_PATH'] = $basePath;
     $_ENV['APP_STORAGE_PATH'] = $storagePath;
     putenv("APP_BASE_PATH=$basePath");
     putenv("APP_STORAGE_PATH=$storagePath");
-    putenv("VIEW_COMPILED_PATH=$storagePath/framework/views");
 
-    // 5. Ensure Writable Storage
+    // 5. Ensure Storage Structure
     foreach (['/framework/views', '/framework/cache', '/framework/sessions', '/logs'] as $path) {
         if (!is_dir($storagePath . $path)) {
             @mkdir($storagePath . $path, 0755, true);
         }
     }
 
-    // 6. Bootstrap Laravel
+    // 6. Bootstrap
     $app = require_once $basePath . '/bootstrap/app.php';
 
-    // 7. Set Storage Path Instance
+    // 7. Manual Path Overrides (Defensive)
     $app->useStoragePath($storagePath);
-
-    // 8. Handle Request (Standard Laravel 11/12 way)
+    $app->instance('path.config', $basePath . '/config');
+    $app->instance('path.public', $basePath . '/public');
+    
+    // 8. Handle
     $app->handleRequest(Illuminate\Http\Request::capture());
 
 } catch (\Throwable $e) {
