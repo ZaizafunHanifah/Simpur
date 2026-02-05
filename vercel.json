@@ -1,11 +1,11 @@
 {
     "version": 2,
+    "buildCommand": "bash build.sh",
     "functions": {
         "api/index.php": {
             "runtime": "vercel-php@0.7.1"
         }
     },
-    "installCommand": "cd backend && composer install --no-dev --optimize-autoloader",
     "routes": [
         {
             "src": "/public/(.*)",
