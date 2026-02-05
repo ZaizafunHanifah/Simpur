@@ -4,32 +4,24 @@
 // Routes all requests to the backend Laravel application
 
 $backendPath = realpath(__DIR__ . '/../backend');
-$vendorAutoload = $backendPath . '/vendor/autoload.php';
 
-// If Composer dependencies are not installed, return a clear 500
-if (!file_exists($vendorAutoload)) {
-    http_response_code(500);
-    echo "Dependencies not installed. Please enable composer install in your Vercel build (set `installCommand` to `cd backend && composer install`) or run `composer install` locally and push the `vendor` folder.`";
-    exit;
+define('LARAVEL_START', microtime(true));
+
+// Check maintenance mode
+if (file_exists($maintenance = $backendPath . '/storage/framework/maintenance.php')) {
+    require $maintenance;
 }
 
-require_once $vendorAutoload;
+// Register Composer autoloader
+$vendorAutoload = $backendPath . '/vendor/autoload.php';
+if (!file_exists($vendorAutoload)) {
+    http_response_code(500);
+    die("Dependencies not installed. Run 'composer install' in the backend folder.");
+}
+require $vendorAutoload;
 
-// Create kernel and handle request
-$app = require $backendPath . '/bootstrap/app.php';
- 
-// Enable error display temporarily for debugging on Vercel
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-putenv('APP_DEBUG=true');
+// Bootstrap Laravel
+$app = require_once $backendPath . '/bootstrap/app.php';
 
-$kernel = $app->make(Illuminate\\Contracts\\Http\\Kernel::class);
-
-$response = $kernel->handle(
-    $request = Illuminate\\Http\\Request::capture()
-);
-
-$response->send();
-
-$kernel->terminate($request, $response);
+// Handle the request using Laravel's native handler
+$app->handleRequest(\Illuminate\Http\Request::capture());
