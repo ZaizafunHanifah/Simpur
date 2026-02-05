@@ -1,15 +1,38 @@
 #!/bin/bash
 set -e
 
-echo "Installing backend dependencies..."
-cd backend
+echo "--- Starting Build Process ---"
 
-# Download composer if not exists
-if [ ! -f composer.phar ]; then
-    echo "Downloading Composer..."
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=.
+# 1. Handle Backend Assets
+echo "Building Backend assets..."
+if [ -d "backend" ]; then
+    cd backend
+    if [ -f "package.json" ]; then
+        npm install
+        npm run build
+    fi
+    cd ..
+else
+    echo "Warning: backend directory not found."
 fi
 
-# Run composer install
-php composer.phar install --no-dev --optimize-autoloader
-echo "Backend dependencies installed successfully!"
+# 2. Handle Frontend Assets
+echo "Building Frontend assets..."
+if [ -d "frontend" ]; then
+    cd frontend
+    if [ -f "package.json" ]; then
+        npm install
+        npm run build
+    fi
+    cd ..
+else
+    echo "Warning: frontend directory not found."
+fi
+
+# 3. PHP Dependencies Note
+echo "Note: PHP dependencies are NOT installed during this build phase."
+echo "They will be handled by the Vercel PHP runtime using the root composer.json."
+echo "If you encounter issues, ensure 'backend/vendor' is committed or the root composer.json is complete."
+
+echo "--- Build Process Completed ---"
+exit 0

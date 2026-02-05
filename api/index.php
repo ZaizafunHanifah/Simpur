@@ -14,11 +14,19 @@ if (file_exists($maintenance = $backendPath . '/storage/framework/maintenance.ph
 
 // Register Composer autoloader
 $vendorAutoload = $backendPath . '/vendor/autoload.php';
-if (!file_exists($vendorAutoload)) {
+$rootAutoload = realpath(__DIR__ . '/../vendor/autoload.php');
+
+if (file_exists($vendorAutoload)) {
+    require $vendorAutoload;
+} elseif (file_exists($rootAutoload)) {
+    require $rootAutoload;
+} else {
     http_response_code(500);
-    die("Dependencies not installed. Run 'composer install' in the backend folder.");
+    echo "Dependencies not installed. Autoloader not found at:<br>";
+    echo "- " . $vendorAutoload . "<br>";
+    echo "- " . $rootAutoload . "<br>";
+    die("Run 'composer install' locally and commit vendor/ or ensure root composer.json is correct.");
 }
-require $vendorAutoload;
 
 // Bootstrap Laravel
 $app = require_once $backendPath . '/bootstrap/app.php';
