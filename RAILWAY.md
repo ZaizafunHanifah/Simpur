@@ -29,8 +29,10 @@ Railway menggunakan **Nixpacks** secara default. Berikut adalah konfigurasi yang
 Anda perlu mengisi variabel berikut di tab **Variables** pada setiap service di Railway.
 
 ### Backend ENV:
+- `NIXPACKS_PHP_VERSION`: `8.4` (PENTING: Laravel 12 & Symfony 8 membutuhkan PHP 8.4)
 - `APP_ENV`: `production`
 - `APP_DEBUG`: `false`
+
 - `APP_KEY`: *(Generate via Railway: `php artisan key:generate --show` atau masukkan manual)*
 - `APP_URL`: `https://backend-yourname.up.railway.app`
 - `DB_CONNECTION`: `mysql` (atau postgres)
@@ -38,8 +40,10 @@ Anda perlu mengisi variabel berikut di tab **Variables** pada setiap service di 
 - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`: *(Gunakan referensi dari service database Railway)*
 
 ### Frontend ENV:
+- `NIXPACKS_PHP_VERSION`: `8.4`
 - `APP_URL`: `https://frontend-yourname.up.railway.app`
 - `API_URL`: `https://backend-yourname.up.railway.app/api` (Arahkan ke URL Backend)
+
 
 ---
 
