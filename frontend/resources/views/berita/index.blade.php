@@ -54,8 +54,15 @@
         @endforeach
 
         @if(count($berita) == 0)
-        <div class="col-span-full py-12 text-center text-gray-400">
-            <p>Belum ada berita terbaru untuk ditampilkan.</p>
+        <div class="col-span-full py-20 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2zM14 4v4h4"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-1">Belum Ada Berita</h3>
+            <p class="text-gray-500 max-w-xs mx-auto mb-6">Informasi terbaru belum tersedia atau koneksi ke server pusat sedang mengalami kendala.</p>
+            <div class="text-xs text-gray-400 font-mono">
+                System Info: backend unreachable. Check <code>/debug-api</code> for details.
+            </div>
         </div>
         @endif
 
