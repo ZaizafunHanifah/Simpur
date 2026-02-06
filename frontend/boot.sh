@@ -37,7 +37,8 @@ ls -F public/
 echo "Contents of public/build:"
 ls -R public/build/ || echo "No build directory found"
 
-# 7. Start Server (Standard Laravel Serve via public root)
-echo "Starting Frontend server on port ${PORT:-8080} with public root..."
+# 7. Start Server (Using Official Artisan Serve)
+echo "Final check: Listening on PORT $PORT"
+echo "Starting Frontend server..."
 # Gunakan exec agar PHP menjadi proses utama (PID 1)
-exec php -S 0.0.0.0:${PORT:-8080} -t public/ public/index.php
+exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
