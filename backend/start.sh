@@ -15,8 +15,8 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Diagnostic Database (Gunakan getenv bukan env)
-echo "Checking Database Connection..."
+# 3. Diagnostic Database
+echo "Checking Database Connection & Data..."
 php -r "
 try {
     \$host = getenv('DB_HOST');
@@ -26,8 +26,16 @@ try {
     \$pass = getenv('DB_PASSWORD');
     \$pdo = new PDO(\"mysql:host=\$host;port=\$port;dbname=\$db\", \$user, \$pass);
     echo 'Connection Successful' . PHP_EOL;
+
+    // Hitung data sebagai bukti
+    \$stmt = \$pdo->query('SELECT COUNT(*) FROM users');
+    echo 'Users Count: ' . \$stmt->fetchColumn() . PHP_EOL;
+
+    \$stmt = \$pdo->query('SELECT COUNT(*) FROM beritas');
+    echo 'Beritas Count: ' . \$stmt->fetchColumn() . PHP_EOL;
+
 } catch (PDOException \$e) {
-    echo 'Connection Failed: ' . \$e->getMessage() . PHP_EOL;
+    echo 'Connection Failed/Tables not ready yet: ' . \$e->getMessage() . PHP_EOL;
 }"
 
 # 4. Jalankan migrasi dan seeder
@@ -37,6 +45,10 @@ php artisan migrate --force
 echo "Starting Database Seeding..."
 php artisan db:seed --force -v || echo "Seeding encountered an issue but continuing to start server..."
 
-# 5. Jalankan server
+# 5. Diagnostic Akhir
+echo "Final Data Count Checkout..."
+php artisan tinker --execute="echo 'Final Users: ' . \App\Models\User::count() . PHP_EOL; echo 'Final Beritas: ' . \App\Models\Berita::count() . PHP_EOL;"
+
+# 6. Jalankan server
 echo "Starting server on port $PORT..."
 php -S 0.0.0.0:$PORT server.php
