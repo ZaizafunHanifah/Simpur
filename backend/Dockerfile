@@ -22,7 +22,6 @@ RUN composer install --optimize-autoloader --no-dev
 # 5. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 6. Jalankan menggunakan $PORT dinamis milik Railway
-# Railway akan memberikan variabel PORT otomatis, jadi jangan di-hardcode.
+# 6. Jalankan menggunakan built-in server langsung (Bypass artisan serve bug)
 EXPOSE 8080
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+CMD php -S 0.0.0.0:$PORT -t public
