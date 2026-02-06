@@ -21,8 +21,8 @@ RUN composer install --optimize-autoloader --no-dev && npm install && npm run bu
 
 # 5. Permissions & Format Fix (Crucial for Windows dev)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
-    chmod +x /var/www/html/start.sh && \
-    sed -i 's/\r$//' /var/www/html/start.sh
+    chmod +x /var/www/html/boot.sh && \
+    sed -i 's/\r$//' /var/www/html/boot.sh
 
 # 6. Startup
-CMD ["/var/www/html/start.sh"]
+CMD ["/var/www/html/boot.sh"]
