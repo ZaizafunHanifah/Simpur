@@ -17,30 +17,26 @@ fi
 
 # 3. Diagnostic Backend URL
 if [ -n "$BACKEND_URL" ]; then
-    echo "Backend URL: $BACKEND_URL"
+    echo "Backend Hub: $BACKEND_URL"
+    curl -I -s --connect-timeout 5 "$BACKEND_URL" || echo "Backend check skipped"
 else
     echo "WARNING: BACKEND_URL is not set!"
 fi
 
-# 4. Permissions
-echo "Setting permissions..."
-chmod -R 777 storage bootstrap/cache public/build
-find storage -type d -exec chmod 777 {} +
-find storage -type f -exec chmod 666 {} +
-
-# 5. Clear Cache
+# 4. Clear Cache & Forced Session
 echo "Preparing Laravel Environment..."
 export SESSION_DRIVER=file
 php artisan config:clear
 php artisan view:clear
 php artisan route:clear
 
-# 6. Check files
-echo "Directory content check:"
-ls -F public/
-ls -F public/index.php
+# 5. Permissions (Standard but thorough)
+echo "Setting permissions..."
+chmod -R 777 storage bootstrap/cache public/build
 
-# 7. Start Server (Ultimate Standard Mode)
+# 6. Check files
+ls -la server.php public/index.php
+
+# 7. Start Server (Mirroring WORKING Backend command)
 echo "Starting frontend server on port $PORT..."
-# Gunakan exec dan -t public agar PHP menangani request dengan benar
-exec php -S 0.0.0.0:$PORT -t public -d display_errors=1 -d error_reporting=E_ALL
+php -S 0.0.0.0:$PORT server.php
