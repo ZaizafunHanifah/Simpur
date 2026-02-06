@@ -19,9 +19,10 @@ COPY . .
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --optimize-autoloader --no-dev && npm install && npm run build
 
-# 5. Permissions
+# 5. Permissions & Format Fix (Crucial for Windows dev)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
-    chmod +x /var/www/html/start.sh
+    chmod +x /var/www/html/start.sh && \
+    sed -i 's/\r$//' /var/www/html/start.sh
 
 # 6. Startup
 CMD ["/var/www/html/start.sh"]
