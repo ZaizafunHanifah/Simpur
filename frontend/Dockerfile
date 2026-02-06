@@ -12,7 +12,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     unzip \
     git \
     curl \
-    libzip-dev
+    libzip-dev \
+    libapache2-mod-php8.4 || true
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -20,9 +21,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Configure Apache: Disable event/worker and enable prefork + rewrite
-RUN a2dismod mpm_event mpm_worker || true && \
-    a2enmod mpm_prefork || true && \
+# Aggressive Apache MPM fix: Remove all and enable only prefork
+RUN rm -rf /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf && \
+    a2enmod mpm_prefork && \
     a2enmod rewrite
 
 # Install Composer
@@ -46,7 +47,8 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # Set port to 8081
-RUN sed -i 's/80/8081/g' /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
+RUN sed -i 's/Listen 80/Listen 8081/g' /etc/apache2/ports.conf
+RUN sed -i 's/:80/:8081/g' /etc/apache2/sites-available/*.conf
 
 # Expose port
 EXPOSE 8081
