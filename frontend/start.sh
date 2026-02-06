@@ -1,4 +1,5 @@
 #!/bin/sh
+set -x
 
 # 1. Pastikan file .env ada
 if [ ! -f .env ]; then
@@ -12,6 +13,6 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Jalankan server asli PHP dengan router Laravel
+# 3. Jalankan server
 echo "Starting server on port $PORT..."
-php -S 0.0.0.0:$PORT vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php
+php -S 0.0.0.0:$PORT server.php
