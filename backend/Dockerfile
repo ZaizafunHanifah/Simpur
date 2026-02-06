@@ -1,4 +1,4 @@
-# GUNAKAN PHP-CLI UNTUK MENGHINDARI ERROR APACHE MPM
+# GUNAKAN PHP-CLI (SANGAT STABIL DI RAILWAY)
 FROM php:8.4-cli
 
 # 1. Install extension installer & extensions
@@ -12,16 +12,17 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/html
 
-# 4. Copy data
+# 3. Copy data
 COPY . .
 
-# 5. Install Composer & Dependencies
+# 4. Install Composer & Dependencies
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --optimize-autoloader --no-dev
 
-# 6. Permissions
+# 5. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 7. Start Laravel menggunakan built-in server (sangat stabil di Railway)
+# 6. Jalankan menggunakan $PORT dinamis milik Railway
+# Railway akan memberikan variabel PORT otomatis, jadi jangan di-hardcode.
 EXPOSE 8080
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
