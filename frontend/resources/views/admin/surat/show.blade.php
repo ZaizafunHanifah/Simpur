@@ -68,15 +68,15 @@
                 <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Nama Lengkap</label>
-                        <div class="text-gray-900 font-semibold text-lg">{{ $surat['warga']['nama_lengkap'] }}</div>
+                        <div class="text-gray-900 font-semibold text-lg">{{ data_get($surat, 'warga.nama_lengkap', '') }}</div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">NIK</label>
-                        <div class="text-gray-900 font-mono text-lg tracking-wide">{{ $surat['warga']['nik'] }}</div>
+                        <div class="text-gray-900 font-mono text-lg tracking-wide">{{ data_get($surat, 'warga.nik', '') }}</div>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Alamat</label>
-                        <div class="text-gray-900">{{ $surat['warga']['alamat'] }}</div>
+                        <div class="text-gray-900">{{ data_get($surat, 'warga.alamat', '') }}</div>
                     </div>
                 </div>
             </div>

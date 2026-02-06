@@ -34,8 +34,8 @@
                                 <span class="block text-xs text-gray-400">{{ \Carbon\Carbon::parse($item['created_at'])->format('H:i') }}</span>
                             </td>
                             <td class="p-6">
-                                <div class="font-bold text-gray-900">{{ $item['warga']['nama_lengkap'] }}</div>
-                                <div class="text-xs text-gray-500 font-mono">{{ $item['warga']['nik'] }}</div>
+                                <div class="font-bold text-gray-900">{{ data_get($item, 'warga.nama_lengkap', '') }}</div>
+                                <div class="text-xs text-gray-500 font-mono">{{ data_get($item, 'warga.nik', '') }}</div>
                             </td>
                             <td class="p-6 text-sm text-gray-700">
                                 {{ $item['template_surat']['nama_template'] }}

@@ -102,13 +102,14 @@
         statusText.innerHTML = '<span class="text-emerald-600 animate-pulse">Sedang mengecek data...</span>';
         
         try {
-            const response = await axios.get('http://127.0.0.1:8000/api/warga/check?nik=' + nik);
+            const baseUrl = '{{ rtrim(env('BACKEND_URL', 'http://127.0.0.1:8000'), '/') }}';
+            const response = await axios.get(baseUrl + '/api/warga/check?nik=' + nik);
             const warga = response.data.data;
 
-            document.getElementById('namaWarga').value = warga.nama_lengkap;
-            document.getElementById('nikWarga').value = warga.nik;
-            document.getElementById('hiddenNik').value = warga.nik;
-            
+            document.getElementById('namaWarga').value = warga?.nama_lengkap ?? '';
+            document.getElementById('nikWarga').value = warga?.nik ?? '';
+            document.getElementById('hiddenNik').value = warga?.nik ?? '';
+
             section.style.display = 'block';
             statusText.innerHTML = '<span class="text-emerald-600 font-bold flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Data ditemukan!</span>';
             
