@@ -14,14 +14,17 @@ Dokumen ini berisi langkah-langkah teknis untuk mendeploy proyek monorepo (backe
 Railway menggunakan **Nixpacks** secara default. Berikut adalah konfigurasi yang tepat:
 
 ### Backend Service
-- **Root Directory**: `backend`
+> [!IMPORTANT]
+> **Root Directory**: Set ini ke `backend` (di Settings -> Build -> Root Directory)
 - **Build Command**: `composer install --optimize-autoloader --no-dev && php artisan config:cache && php artisan route:cache && php artisan view:cache`
 - **Start Command**: `php artisan serve --host=0.0.0.0 --port=$PORT`
 
 ### Frontend Service
-- **Root Directory**: `frontend`
+> [!IMPORTANT]
+> **Root Directory**: Set ini ke `frontend` (di Settings -> Build -> Root Directory)
 - **Build Command**: `composer install --optimize-autoloader --no-dev && php artisan config:cache && php artisan route:cache && php artisan view:cache && npm install && npm run build`
 - **Start Command**: `php artisan serve --host=0.0.0.0 --port=$PORT`
+
 
 ---
 
@@ -87,3 +90,12 @@ Karena frontend dan backend beda domain, edit file `backend/config/cors.php`:
 2. **Logging**: Gunakan `LOG_CHANNEL=errorlog` agar log Laravel muncul di Log Railway.
 3. **Session & Cache**: Gunakan `database` atau `redis` service Railway untuk Session dan Cache (Jangan gunakan `file`).
 4. **HTTPS**: Railway otomatis menyediakan SSL (HTTPS), pastikan `FORCE_HTTPS=true` di ENV jika diperlukan.
+
+---
+
+## 8. Troubleshooting PHP Version Error
+Jika Anda melihat error `symfony/... requires php >=8.4 -> your php version (8.2.30) does not satisfy`:
+1.  **Pastikan Variabel Disetel**: Cek kembali apakah `NIXPACKS_PHP_VERSION` = `8.4` sudah ada di tab **Variables**.
+2.  **Cek Root Directory**: Pastikan Anda sudah menyetel **Root Directory** ke `/backend` atau `/frontend` (di Settings -> Build -> Root Directory). Jika dikosongkan, Railway akan mencoba menggunakan `composer.json` di root folder yang mungkin menyebabkan bentrok.
+3.  **Hapus Cache Build**: Di Railway, klik tombol **Redeploy** dengan opsi **Clear Cache** (jika tersedia) untuk memastikan perubahan `composer.json` terbaru terbaca.
+
