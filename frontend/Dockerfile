@@ -23,5 +23,6 @@ RUN composer install --optimize-autoloader --no-dev && npm install && npm run bu
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # 6. Jalankan menggunakan $PORT dinamis milik Railway
-EXPOSE 8081
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8081}
+# Gunakan shell form agar $PORT terbaca dengan benar
+EXPOSE 8080
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
