@@ -12,7 +12,7 @@ fi
 
 # 2. Force Production Settings for Stability
 export SESSION_DRIVER=file
-export APP_DEBUG=true
+export APP_DEBUG=false
 export LOG_CHANNEL=stderr
 
 # 3. Laravel Prep
@@ -23,6 +23,7 @@ php artisan route:clear
 
 # 4. Permissions
 echo "Fixing Permissions..."
+mkdir -p bootstrap/cache public/build storage/{app,framework/cache,framework/sessions,framework/views,logs}
 chmod -R 777 storage bootstrap/cache public/build
 
 # 5. Diagnostic
