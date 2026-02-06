@@ -22,6 +22,5 @@ RUN composer install --optimize-autoloader --no-dev && npm install && npm run bu
 # 5. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 6. Startup Script (Ensure PORT is respected and APP_KEY exists)
-# Kita gunakan shell form untuk ekspansi variabel $PORT
-CMD sh -c "php artisan key:generate --force && php -S 0.0.0.0:$PORT -t public"
+# 6. Startup Script
+CMD sh -c "touch .env && php artisan key:generate --force && php -S 0.0.0.0:$PORT -t public"

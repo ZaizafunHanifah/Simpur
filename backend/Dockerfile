@@ -22,6 +22,7 @@ RUN composer install --optimize-autoloader --no-dev
 # 5. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 6. Startup Script (Ensure PORT is respected and APP_KEY exists)
-# Kita gunakan shell form untuk ekspansi variabel $PORT
-CMD sh -c "php artisan key:generate --force && php -S 0.0.0.0:$PORT -t public"
+# 6. Startup Script
+# - touch .env: Supaya key:generate tidak error karena file tidak ada
+# - key:generate: Hanya jalan jika APP_KEY belum ada (tapi di Docker selalu jalan jika .env dummy)
+CMD sh -c "touch .env && php artisan key:generate --force && php -S 0.0.0.0:$PORT -t public"
