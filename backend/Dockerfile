@@ -18,10 +18,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Configure Apache
-RUN a2enmod rewrite
-# Ensure we use prefork and disable event to avoid conflicts
-RUN sed -i 's/mpm_event_module/mpm_prefork_module/g' /etc/apache2/apache2.conf || true
+# Configure Apache: Disable event/worker and enable prefork + rewrite
+RUN a2dismod mpm_event mpm_worker || true && \
+    a2enmod mpm_prefork || true && \
+    a2enmod rewrite
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -43,7 +43,7 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Set port to 8080 (Matches Railway Networking)
+# Set port to 8080
 RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
 
 # Expose port
