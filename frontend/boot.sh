@@ -33,4 +33,4 @@ echo "Backend URL: $BACKEND_URL"
 # 6. Start Server (Mirroring WORKING Backend command + verbose errors)
 echo "Starting Frontend server on port $PORT..."
 # Gunakan exec agar PHP menjadi proses utama (PID 1)
-exec php -S 0.0.0.0:$PORT server.php -d display_errors=1 -d error_reporting=E_ALL
+exec php -S 0.0.0.0:${PORT:-8080} server.php -d display_errors=1 -d error_reporting=E_ALL
