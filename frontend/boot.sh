@@ -37,8 +37,9 @@ ls -F public/
 echo "Contents of public/build:"
 ls -R public/build/ || echo "No build directory found"
 
-# 7. Start Server (Using Official Artisan Serve)
-echo "Final check: Listening on PORT $PORT"
-echo "Starting Frontend server..."
+
+# 7. Start Server (Standard PHP SAPI - Matching WORKING Backend)
+export PORT=${PORT:-8080}
+echo "STARTING FRONTEND ON PORT: $PORT"
 # Gunakan exec agar PHP menjadi proses utama (PID 1)
-exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+exec php -S 0.0.0.0:$PORT server.php
