@@ -12,7 +12,7 @@ fi
 
 # 2. Force Production Settings for Stability
 export SESSION_DRIVER=file
-export APP_DEBUG=false
+export APP_DEBUG=true
 export LOG_CHANNEL=stderr
 
 # 3. Laravel Prep

@@ -5,7 +5,9 @@ use Illuminate\Http\Request;
 
 // Force error reporting to catch boot crashes in Railway logs
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', '1');
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__.'/../storage/logs/laravel.log');
 
 define('LARAVEL_START', microtime(true));
 
