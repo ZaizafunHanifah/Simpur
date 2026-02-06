@@ -1,7 +1,7 @@
 # Use PHP 8.4 with Apache
 FROM php:8.4-apache
 
-# Install nodejs for building assets
+# Install nodejs
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update && apt-get install -y \
     nodejs \
@@ -20,10 +20,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Enable Apache mod_rewrite and ensure correct MPM
-RUN a2dismod mpm_event || true && \
-    a2enmod mpm_prefork || true && \
-    a2enmod rewrite
+# Configure Apache
+RUN a2enmod rewrite
+# Ensure we use prefork and disable event to avoid conflicts
+RUN sed -i 's/mpm_event_module/mpm_prefork_module/g' /etc/apache2/apache2.conf || true
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -31,10 +31,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all files from the frontend directory
+# Copy files
 COPY . .
 
-# Install dependencies
+# Install dependencies and build assets
 RUN composer install --optimize-autoloader --no-dev && npm install && npm run build
 
 # Set permissions
@@ -45,7 +45,7 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Set port to 8081
+# Set port to 8081 (Matches Railway Networking)
 RUN sed -i 's/80/8081/g' /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
 
 # Expose port
