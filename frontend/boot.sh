@@ -30,7 +30,14 @@ chmod -R 777 storage bootstrap/cache public/build
 echo "Running on Port: $PORT"
 echo "Backend URL: $BACKEND_URL"
 
-# 6. Start Server (Mirroring WORKING Backend command + verbose errors)
-echo "Starting Frontend server on port $PORT..."
+
+# 6. Diagnostics (Internal Check)
+echo "Contents of public directory:"
+ls -F public/
+echo "Contents of public/build:"
+ls -R public/build/ || echo "No build directory found"
+
+# 7. Start Server (Standard Laravel Serve via public root)
+echo "Starting Frontend server on port ${PORT:-8080} with public root..."
 # Gunakan exec agar PHP menjadi proses utama (PID 1)
-exec php -S 0.0.0.0:${PORT:-8080} server.php -d display_errors=1 -d error_reporting=E_ALL
+exec php -S 0.0.0.0:${PORT:-8080} -t public/ public/index.php

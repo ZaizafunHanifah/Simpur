@@ -1,5 +1,14 @@
 <?php
 
+// Allow the PHP built-in server to serve static assets directly
+if (php_sapi_name() === 'cli-server') {
+    $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+    if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
+        return false;
+    }
+}
+
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
