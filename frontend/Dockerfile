@@ -1,27 +1,25 @@
 # Use PHP 8.4 with Apache
 FROM php:8.4-apache
 
-# Install nodejs and system dependencies
+# Install nodejs
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get update && apt-get install -y \
-    nodejs \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
+    apt-get update && apt-get install -y nodejs
+
+# Use the official PHP extension installer
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+# Install PHP extensions and their system dependencies automatically
+RUN install-php-extensions pdo_mysql mbstring exif pcntl bcmath gd zip
+
+# Install other system dependencies
+RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    curl \
-    libzip-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev
+    curl
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Aggressive Apache MPM fix: Remove all and enable only prefork
 RUN rm -rf /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf && \
