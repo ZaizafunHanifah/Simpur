@@ -15,16 +15,15 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Diagnostic Backend Connectivity (Full Check)
+# 3. Diagnostic Backend Connectivity
 if [ -n "$BACKEND_URL" ]; then
     echo "Testing connectivity to Backend: $BACKEND_URL"
-    # Coba telnet-style check atau curl sederhana
     curl -o /dev/null -s -w "%{http_code}" --connect-timeout 5 "$BACKEND_URL" && echo " | Backend is REACHABLE"
 else
     echo "WARNING: BACKEND_URL is not set!"
 fi
 
-# 4. Permissions (Nuclear Fix)
+# 4. Permissions
 echo "Setting permissions..."
 chmod -R 777 storage bootstrap/cache public/build
 chown -R www-data:www-data storage bootstrap/cache
@@ -40,6 +39,6 @@ php artisan route:clear
 echo "Checking build assets..."
 ls -R public/build || echo "Build assets not found!"
 
-# 7. Jalankan server (Gunakan server.php seperti di Backend)
+# 7. Jalankan server (TANPA EXEC, samakan dengan Backend log yang sukses)
 echo "Starting frontend server on port $PORT..."
-exec php -S 0.0.0.0:$PORT server.php
+php -S 0.0.0.0:$PORT server.php

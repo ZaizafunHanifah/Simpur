@@ -3,6 +3,10 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
+// Force error reporting to catch boot crashes in Railway logs
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...
@@ -11,11 +15,7 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 }
 
 // Register the Composer autoloader...
-if (file_exists(__DIR__.'/../vendor/autoload.php')) {
-    require __DIR__.'/../vendor/autoload.php';
-} else {
-    require __DIR__.'/../../vendor/autoload.php';
-}
+require __DIR__.'/../vendor/autoload.php';
 
 // Bootstrap Laravel and handle the request...
 /** @var Application $app */
