@@ -15,20 +15,24 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Clear Cache
-echo "Preparing Environment..."
+# 3. Environment Check
+echo "Backend URL: $BACKEND_URL"
+
+# 4. Clear Cache
+echo "Preparing Laravel..."
 export SESSION_DRIVER=file
 php artisan config:clear
 php artisan view:clear
 php artisan route:clear
 
-# 4. Permissions
+# 5. Permissions
 echo "Setting Permissions..."
 chmod -R 777 storage bootstrap/cache public/build
 
-# 5. Diagnostic
-echo "Backend URL: $BACKEND_URL"
+# 6. Check entry point
+ls -la server.php public/index.php
 
-# 6. Start Server (Standard Mode)
+# 7. Start Server (Standard Mode)
 echo "Starting frontend server on port $PORT..."
+# Gunakan exec agar log tersalurkan dengan benar
 exec php -S 0.0.0.0:$PORT server.php
