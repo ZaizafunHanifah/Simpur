@@ -1,6 +1,5 @@
 #!/bin/sh
-# Mode debug: Berhenti jika ada error (-e) dan tampilkan setiap perintah (-x)
-set -xe
+set -x
 
 echo "--- STARTING BACKEND STARTUP SCRIPT ---"
 
@@ -10,22 +9,20 @@ if [ ! -f .env ]; then
     touch .env
 fi
 
-# 2. Generate APP_KEY jika belum ada di variabel env Railway
+# 2. Generate APP_KEY jika belum ada (Bisa dari env Railway atau otomatis)
 if [ -z "$APP_KEY" ]; then
     echo "Generating APP_KEY..."
     php artisan key:generate --force
-else
-    echo "APP_KEY already set in environment."
 fi
 
 # 3. Jalankan migrasi dan seeder
+# Kita biarkan lanjut walaupun seeder gagal (robustus)
 echo "Starting Database Migration..."
 php artisan migrate --force
 
 echo "Starting Database Seeding..."
-# Tambah verbose (-v) agar error terlihat jelas di log
-php artisan db:seed --force -v
+php artisan db:seed --force -v || echo "Seeding encountered an issue but continuing to start server..."
 
-# 4. Jalankan server
+# 4. Jalankan server (Entry point utama)
 echo "Starting server on port $PORT..."
 php -S 0.0.0.0:$PORT server.php

@@ -1,10 +1,9 @@
 #!/bin/sh
-# Mode debug: Berhenti jika ada error (-e) dan tampilkan setiap perintah (-x)
-set -xe
+set -x
 
 echo "--- STARTING FRONTEND STARTUP SCRIPT ---"
 
-# 1. Pastikan file .env ada
+# 1. Pastikan file .env ada (Hanya formalitas untuk Laravel)
 if [ ! -f .env ]; then
     echo "Creating .env file..."
     touch .env
@@ -16,6 +15,6 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Jalankan server
+# 3. Jalankan server (Entry point utama)
 echo "Starting server on port $PORT..."
 php -S 0.0.0.0:$PORT server.php

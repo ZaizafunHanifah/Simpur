@@ -93,7 +93,15 @@ class BeritaSeeder extends Seeder
         ];
 
         foreach ($beritas as $berita) {
-            \App\Models\Berita::create($berita);
+            \App\Models\Berita::updateOrCreate(
+                ['judul' => $berita['judul']],
+                [
+                    'link' => $berita['link'],
+                    'sumber' => $berita['sumber'],
+                    'gambar' => $berita['gambar'],
+                    'deskripsi' => $berita['deskripsi']
+                ]
+            );
         }
     }
 }
