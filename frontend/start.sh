@@ -15,11 +15,10 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Build assets (Jika belum ter-build di Dockerfile atau butuh rebuild dengan env Railway)
-# Kadang VITE_API_URL butuh build di runtime jika tidak di-pass saat build time
-# Tapi kita coba jalankan server dulu. 
-# Jika UI kosong, mungkin perlu npm run build di sini.
+# 3. Check assets
+echo "Checking build assets..."
+ls -R public/build || echo "Build assets not found!"
 
-# 4. Jalankan server
-echo "Starting server on port $PORT..."
+# 4. Jalankan server (Gunakan server.php di root)
+echo "Starting frontend server on port $PORT..."
 php -S 0.0.0.0:$PORT server.php
