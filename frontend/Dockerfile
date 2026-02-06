@@ -20,7 +20,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --optimize-autoloader --no-dev && npm install && npm run build
 
 # 5. Permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
+    chmod +x /var/www/html/start.sh
 
-# 6. Startup Script
-CMD sh -c "touch .env && php artisan key:generate --force && php -S 0.0.0.0:$PORT -t public"
+# 6. Startup
+CMD ["/var/www/html/start.sh"]

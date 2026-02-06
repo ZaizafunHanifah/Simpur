@@ -20,9 +20,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --optimize-autoloader --no-dev
 
 # 5. Permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
+    chmod +x /var/www/html/start.sh
 
-# 6. Startup Script
-# - touch .env: Supaya key:generate tidak error karena file tidak ada
-# - key:generate: Hanya jalan jika APP_KEY belum ada (tapi di Docker selalu jalan jika .env dummy)
-CMD sh -c "touch .env && php artisan key:generate --force && php -S 0.0.0.0:$PORT -t public"
+# 6. Startup
+CMD ["/var/www/html/start.sh"]
