@@ -40,6 +40,7 @@ ls -R public/build/ || echo "No build directory found"
 
 # 7. Start Server (Standard PHP SAPI - Matching WORKING Backend)
 export PORT=${PORT:-8080}
-echo "STARTING FRONTEND ON PORT: $PORT"
+echo "STARTING FRONTEND ON PORT: $PORT (DocRoot: public)"
 # Gunakan exec agar PHP menjadi proses utama (PID 1)
-exec php -S 0.0.0.0:$PORT server.php
+# Menambahkan -t public adalah KUNCI agar asset() bisa terbaca oleh built-in server
+exec php -S 0.0.0.0:$PORT -t public server.php
