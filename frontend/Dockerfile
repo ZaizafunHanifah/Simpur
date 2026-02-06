@@ -1,9 +1,9 @@
-# DOCKERFILE FRONTEND (FORCE REBUILD 2026-02-06)
+# DOCKERFILE FRONTEND (FINAL STABILIZATION 2026-02-06-2330)
 FROM php:8.4-cli
 
 # 1. Node.js & PHP setup
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get update && apt-get install -y nodejs zip unzip git curl \
+    && apt-get update && apt-get install -y nodejs zip unzip git curl procps \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2. Install extensions
