@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-$backendUrl = env('BACKEND_URL', 'http://127.0.0.1:8000');
+function backend_url() {
+    return env('BACKEND_URL', 'http://127.0.0.1:8000');
+}
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,7 +21,7 @@ Route::post('/login', function (Request $request) {
     try {
         $response = Http::timeout(30)
             ->acceptJson()
-            ->post($backendUrl . '/api/login', [
+            ->post(backend_url() . '/api/login', [
                 'email' => $request->email,
                 'password' => $request->password,
             ]);
@@ -47,7 +49,7 @@ Route::post('/login', function (Request $request) {
 
 Route::get('/logout', function () {
     if(session('api_token')) {
-        Http::withToken(session('api_token'))->post($backendUrl . '/api/logout');
+        Http::withToken(session('api_token'))->post(backend_url() . '/api/logout');
     }
     session()->forget('api_token');
     return redirect('/');
@@ -64,8 +66,8 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
         $token = session('api_token');
         $headers = ['Accept' => 'application/json', 'Authorization' => 'Bearer ' . $token];
         
-        $responseSurat = Http::withHeaders($headers)->get($backendUrl . '/api/surat/masuk');
-        $responseWarga = Http::withHeaders($headers)->get($backendUrl . '/api/warga');
+        $responseSurat = Http::withHeaders($headers)->get(backend_url() . '/api/surat/masuk');
+        $responseWarga = Http::withHeaders($headers)->get(backend_url() . '/api/warga');
         
         $suratCount = 0;
         $statusCounts = [
@@ -93,14 +95,14 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
     // Admin Surat Routes
     Route::get('/admin/surat', function () {
         $token = session('api_token');
-        $response = Http::withToken($token)->get($backendUrl . '/api/surat/masuk');
+        $response = Http::withToken($token)->get(backend_url() . '/api/surat/masuk');
         $surat = $response->successful() ? ($response->json() ?? []) : [];
         return view('admin.surat.index', compact('surat'));
     })->name('admin.surat.index');
 
     Route::get('/admin/surat/{id}', function ($id) {
         $token = session('api_token');
-        $response = Http::withToken($token)->get($backendUrl . '/api/surat/' . $id);
+        $response = Http::withToken($token)->get(backend_url() . '/api/surat/' . $id);
         
         if(!$response->successful()) return redirect()->back()->with('error', 'Data tidak ditemukan');
         
@@ -111,7 +113,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
     Route::get('/admin/surat/{id}/download', function (Request $request, $id) {
         $token = session('api_token');
         // Fetch raw PDF content with query params (signatory overrides)
-        $response = Http::withToken($token)->get($backendUrl . '/api/surat/' . $id . '/pdf', $request->query());
+        $response = Http::withToken($token)->get(backend_url() . '/api/surat/' . $id . '/pdf', $request->query());
         
         if ($response->successful()) {
             return response($response->body())
@@ -123,17 +125,17 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
 
     // Actions
     Route::put('/admin/surat/{id}/verify', function ($id) {
-        $response = Http::withToken(session('api_token'))->put($backendUrl . '/api/surat/'.$id.'/verify');
+        $response = Http::withToken(session('api_token'))->put(backend_url() . '/api/surat/'.$id.'/verify');
         return back()->with($response->successful() ? 'success' : 'error', 'Status Verifikasi Diperbarui');
     })->name('admin.surat.verify');
 
     Route::put('/admin/surat/{id}/reject', function ($id) {
-        $response = Http::withToken(session('api_token'))->put($backendUrl . '/api/surat/'.$id.'/reject');
+        $response = Http::withToken(session('api_token'))->put(backend_url() . '/api/surat/'.$id.'/reject');
         return back()->with($response->successful() ? 'success' : 'error', 'Surat Ditolak');
     })->name('admin.surat.reject');
     
     Route::put('/admin/surat/{id}/sign', function (Request $request, $id) {
-        $response = Http::withToken(session('api_token'))->put($backendUrl . '/api/surat/'.$id.'/sign', [
+        $response = Http::withToken(session('api_token'))->put(backend_url() . '/api/surat/'.$id.'/sign', [
             'penandatangan_nama' => $request->penandatangan_nama,
             'penandatangan_jabatan' => $request->penandatangan_jabatan
         ]);
@@ -147,7 +149,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
     })->name('admin.surat.sign');
 
     Route::delete('/admin/surat/{id}', function ($id) {
-        $response = Http::withToken(session('api_token'))->delete($backendUrl . '/api/surat/' . $id);
+        $response = Http::withToken(session('api_token'))->delete(backend_url() . '/api/surat/' . $id);
         
         if ($response->successful()) {
             return redirect()->route('admin.surat.index')->with('success', 'Surat berhasil dihapus');
@@ -159,7 +161,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
     // -- ADMIN WARGA MANAGEMENT ROUTES --
     Route::get('/admin/warga', function () {
         $token = session('api_token');
-        $response = Http::withToken($token)->get($backendUrl . '/api/warga');
+        $response = Http::withToken($token)->get(backend_url() . '/api/warga');
         $json = $response->json() ?? [];
         $warga = $response->successful() ? ($json['data'] ?? (is_array($json) ? $json : [])) : [];
         return view('admin.warga.index', compact('warga'));
@@ -171,7 +173,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
 
     Route::post('/admin/warga', function (Request $request) {
         $token = session('api_token');
-        $response = Http::withToken($token)->post($backendUrl . '/api/warga', $request->all());
+        $response = Http::withToken($token)->post(backend_url() . '/api/warga', $request->all());
         
         if ($response->successful()) {
             return redirect()->route('admin.warga.index')->with('success', 'Warga berhasil ditambahkan');
@@ -188,7 +190,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
 
     Route::delete('/admin/warga/{id}', function ($id) {
         $token = session('api_token');
-        $response = Http::withToken($token)->delete($backendUrl . '/api/warga/' . $id);
+        $response = Http::withToken($token)->delete(backend_url() . '/api/warga/' . $id);
         
         return back()->with($response->successful() ? 'success' : 'error', 'Data Warga dihapus');
     })->name('admin.warga.destroy');
@@ -196,7 +198,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
     // -- ADMIN BERITA MANAGEMENT ROUTES --
     Route::get('/admin/berita', function () {
         $token = session('api_token');
-        $response = Http::withToken($token)->get($backendUrl . '/api/berita');
+        $response = Http::withToken($token)->get(backend_url() . '/api/berita');
         $berita = $response->successful() ? $response->json() : [];
         return view('admin.berita.index', compact('berita'));
     })->name('admin.berita.index');
@@ -207,7 +209,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
 
     Route::post('/admin/berita', function (Request $request) {
         $token = session('api_token');
-        $response = Http::withToken($token)->post($backendUrl . '/api/berita', $request->all());
+        $response = Http::withToken($token)->post(backend_url() . '/api/berita', $request->all());
         
         if ($response->successful()) {
             return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil diinput');
@@ -218,7 +220,7 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
 
     Route::delete('/admin/berita/{id}', function ($id) {
         $token = session('api_token');
-        $response = Http::withToken($token)->delete($backendUrl . '/api/berita/' . $id);
+        $response = Http::withToken($token)->delete(backend_url() . '/api/berita/' . $id);
         
         return back()->with($response->successful() ? 'success' : 'error', 'Berita dihapus');
     })->name('admin.berita.destroy');
@@ -232,7 +234,7 @@ Route::get('/profil-desa', function () {
 
 Route::get('/berita', function () {
     try {
-        $response = Http::get($backendUrl . '/api/berita/list');
+        $response = Http::get(backend_url() . '/api/berita/list');
         $berita = $response->successful() ? ($response->json() ?? []) : [];
     } catch (\Exception $e) {
         $berita = [];
@@ -243,7 +245,7 @@ Route::get('/berita', function () {
 Route::get('/pengajuan', function () {
     // Fetch Templates form API
     try {
-        $response = Http::get($backendUrl . '/api/templates');
+        $response = Http::get(backend_url() . '/api/templates');
         $templates = $response->successful() ? $response->json() : [];
         // Convert array to object to match view expectation
         $templates = array_map(function($t) { return (object)$t; }, $templates);
@@ -258,7 +260,7 @@ Route::post('/pengajuan', function (Request $request) {
     // 1. Get Warga Token (Auto Login for Demo)
     // In real app, Warga should login first. Here we use the dummy credentials.
     try {
-        $login = Http::post($backendUrl . '/api/login', [
+        $login = Http::post(backend_url() . '/api/login', [
             'email' => 'warga@simpur.desa.id',
             'password' => 'password',
         ]);
@@ -272,7 +274,7 @@ Route::post('/pengajuan', function (Request $request) {
         // 2. Submit Authorization
         $response = Http::withToken($token)
             ->acceptJson()
-            ->post($backendUrl . '/api/pengajuan', [
+            ->post(backend_url() . '/api/pengajuan', [
                 'template_id' => $request->template_id,
                 'data_input' => [
                     'nik' => $request->input('data_input.nik'), // ensure this matches form structure
