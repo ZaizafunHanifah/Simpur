@@ -1,53 +1,37 @@
-# Use PHP 8.4 with Apache
-FROM php:8.4-apache
+# MULTI-STAGE BUILD UNTUK OPTIMALISASI
+FROM php:8.4-apache as base
 
-# Use the official PHP extension installer
+# 1. Install extension installer & extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-
-# Install PHP extensions and their system dependencies automatically
 RUN install-php-extensions pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Install other system dependencies
+# 2. Install dasar (tanpa modul PHP tambahan agar tidak bentrok MPM)
 RUN apt-get update && apt-get install -y \
-    zip \
-    unzip \
-    git \
-    curl
+    zip unzip git curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# 3. Konfigurasi Apache (Minimal)
+RUN a2enmod rewrite
+# PENTING: Jangan sentuh MPM secara manual di sini, biarkan default image yang bekerja
 
-# Aggressive Apache MPM fix: Remove all and enable only prefork
-RUN rm -rf /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf && \
-    a2enmod mpm_prefork && \
-    a2enmod rewrite
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy files
+# 4. Copy data
 COPY . .
 
-# Install dependencies
+# 5. Install Composer & Dependencies
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --optimize-autoloader --no-dev
 
-# Set permissions
+# 6. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Update Apache DocumentRoot to Laravel public folder
+# 7. Port & DocumentRoot
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Set port to 8080
 RUN sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf
 RUN sed -i 's/:80/:8080/g' /etc/apache2/sites-available/*.conf
 
-# Expose port
 EXPOSE 8080
-
-# Start Apache
 CMD ["apache2-foreground"]
