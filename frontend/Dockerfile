@@ -1,4 +1,4 @@
-# GUNAKAN PHP-CLI (SANGAT STABIL DI RAILWAY)
+# DOCKERFILE FRONTEND (STABIL & ROBUST)
 FROM php:8.4-cli
 
 # 1. Node.js & PHP setup
@@ -8,7 +8,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 # 2. Install extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN install-php-extensions pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
 WORKDIR /var/www/html
 
@@ -22,6 +22,6 @@ RUN composer install --optimize-autoloader --no-dev && npm install && npm run bu
 # 5. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 6. Jalankan menggunakan built-in server langsung (Bypass artisan serve bug)
-EXPOSE 8080
-CMD php -S 0.0.0.0:$PORT -t public
+# 6. Startup Script (Ensure PORT is respected and APP_KEY exists)
+# Kita gunakan shell form untuk ekspansi variabel $PORT
+CMD sh -c "php artisan key:generate --force && php -S 0.0.0.0:$PORT -t public"
