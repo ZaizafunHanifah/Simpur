@@ -6,17 +6,20 @@ if [ ! -f .env ]; then
     touch .env
 fi
 
-# 2. Generate APP_KEY jika belum ada (hanya jika APP_KEY kosong di env)
+# 2. Generate APP_KEY
 if [ -z "$APP_KEY" ]; then
     echo "Generating APP_KEY..."
     php artisan key:generate --force
 fi
 
-# 3. Jalankan migrasi dan seeder (Hanya di Backend)
-echo "Running migrations and seeders..."
+# 3. Jalankan migrasi dan seeder
+echo "Starting Database Migration..."
 php artisan migrate --force
+
+echo "Starting Database Seeding..."
 php artisan db:seed --force
 
-# 4. Jalankan server asli PHP dengan router Laravel agar tidak 404/502
+# 4. Jalankan server asli PHP dengan router Laravel
 echo "Starting server on port $PORT..."
+# Gunakan router resmi Laravel 11/12
 php -S 0.0.0.0:$PORT vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php
