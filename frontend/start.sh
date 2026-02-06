@@ -1,5 +1,8 @@
 #!/bin/sh
-set -x
+# Mode debug: Berhenti jika ada error (-e) dan tampilkan setiap perintah (-x)
+set -xe
+
+echo "--- STARTING FRONTEND STARTUP SCRIPT ---"
 
 # 1. Pastikan file .env ada
 if [ ! -f .env ]; then
