@@ -15,10 +15,9 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Diagnostic Backend Connectivity
+# 3. Diagnostic Backend URL
 if [ -n "$BACKEND_URL" ]; then
-    echo "Testing connectivity to Backend: $BACKEND_URL"
-    curl -o /dev/null -s -w "%{http_code}" --connect-timeout 5 "$BACKEND_URL" && echo " | Backend is REACHABLE"
+    echo "Backend URL: $BACKEND_URL"
 else
     echo "WARNING: BACKEND_URL is not set!"
 fi
@@ -26,19 +25,22 @@ fi
 # 4. Permissions
 echo "Setting permissions..."
 chmod -R 777 storage bootstrap/cache public/build
-chown -R www-data:www-data storage bootstrap/cache
+find storage -type d -exec chmod 777 {} +
+find storage -type f -exec chmod 666 {} +
 
-# 5. Clear Cache & Forced Session
+# 5. Clear Cache
 echo "Preparing Laravel Environment..."
 export SESSION_DRIVER=file
 php artisan config:clear
 php artisan view:clear
 php artisan route:clear
 
-# 6. Check assets
-echo "Checking build assets..."
-ls -R public/build || echo "Build assets not found!"
+# 6. Check files
+echo "Directory content check:"
+ls -F public/
+ls -F public/index.php
 
-# 7. Jalankan server (TANPA EXEC, samakan dengan Backend log yang sukses)
+# 7. Start Server (Ultimate Standard Mode)
 echo "Starting frontend server on port $PORT..."
-php -S 0.0.0.0:$PORT server.php
+# Gunakan exec dan -t public agar PHP menangani request dengan benar
+exec php -S 0.0.0.0:$PORT -t public -d display_errors=1 -d error_reporting=E_ALL
