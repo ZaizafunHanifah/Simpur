@@ -15,11 +15,16 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Diagnostic Database
+# 3. Diagnostic Database (Gunakan getenv bukan env)
 echo "Checking Database Connection..."
 php -r "
 try {
-    \$pdo = new PDO('mysql:host=' . env('DB_HOST') . ';port=' . env('DB_PORT') . ';dbname=' . env('DB_DATABASE'), env('DB_USERNAME'), env('DB_PASSWORD'));
+    \$host = getenv('DB_HOST');
+    \$port = getenv('DB_PORT');
+    \$db   = getenv('DB_DATABASE');
+    \$user = getenv('DB_USERNAME');
+    \$pass = getenv('DB_PASSWORD');
+    \$pdo = new PDO(\"mysql:host=\$host;port=\$port;dbname=\$db\", \$user, \$pass);
     echo 'Connection Successful' . PHP_EOL;
 } catch (PDOException \$e) {
     echo 'Connection Failed: ' . \$e->getMessage() . PHP_EOL;
@@ -27,10 +32,10 @@ try {
 
 # 4. Jalankan migrasi dan seeder
 echo "Starting Database Migration..."
-php artisan migrate --force || echo "Migration failed, continuing..."
+php artisan migrate --force
 
 echo "Starting Database Seeding..."
-php artisan db:seed --force -v || echo "Seeding failed, continuing to start server..."
+php artisan db:seed --force -v || echo "Seeding encountered an issue but continuing to start server..."
 
 # 5. Jalankan server
 echo "Starting server on port $PORT..."

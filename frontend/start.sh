@@ -3,7 +3,7 @@ set -x
 
 echo "--- STARTING FRONTEND STARTUP SCRIPT ---"
 
-# 1. Pastikan file .env ada (Hanya formalitas untuk Laravel)
+# 1. Pastikan file .env ada
 if [ ! -f .env ]; then
     echo "Creating .env file..."
     touch .env
@@ -15,6 +15,11 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# 3. Jalankan server (Entry point utama)
+# 3. Build assets (Jika belum ter-build di Dockerfile atau butuh rebuild dengan env Railway)
+# Kadang VITE_API_URL butuh build di runtime jika tidak di-pass saat build time
+# Tapi kita coba jalankan server dulu. 
+# Jika UI kosong, mungkin perlu npm run build di sini.
+
+# 4. Jalankan server
 echo "Starting server on port $PORT..."
 php -S 0.0.0.0:$PORT server.php
