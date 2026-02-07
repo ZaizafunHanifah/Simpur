@@ -15,16 +15,28 @@ class BeritaController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'judul' => 'required|string',
-            'link' => 'required|url',
-            'sumber' => 'nullable|string',
-            'gambar' => 'nullable|string',
-            'deskripsi' => 'nullable|string',
-        ]);
- 
-        $berita = Berita::create($validated);
-        return response()->json($berita, 201);
+        try {
+            $validated = $request->validate([
+                'judul' => 'required|string',
+                'link' => 'required|url',
+                'sumber' => 'nullable|string',
+                'gambar' => 'nullable|string',
+                'kategori' => 'nullable|string',
+                'deskripsi' => 'nullable|string',
+            ]);
+    
+            $berita = Berita::create($validated);
+            return response()->json($berita, 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show(string $id)
@@ -34,14 +46,29 @@ class BeritaController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $validated = $request->validate([
-            'judul' => 'required|string',
-            'link' => 'required|url',
-        ]);
- 
-        $berita = Berita::findOrFail($id);
-        $berita->update($validated);
-        return response()->json($berita);
+        try {
+            $validated = $request->validate([
+                'judul' => 'required|string',
+                'link' => 'required|url',
+                'sumber' => 'nullable|string',
+                'gambar' => 'nullable|string',
+                'kategori' => 'nullable|string',
+                'deskripsi' => 'nullable|string',
+            ]);
+    
+            $berita = Berita::findOrFail($id);
+            $berita->update($validated);
+            return response()->json($berita);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy(string $id)

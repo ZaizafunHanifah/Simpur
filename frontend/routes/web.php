@@ -251,7 +251,11 @@ Route::group(['middleware' => [EnsureApiToken::class]], function () {
 
     Route::post('/admin/berita', function (Request $request) {
         $token = session('api_token');
-        $response = Http::withoutVerifying()->withToken($token)->post(getBackendUrl('/api/berita'), $request->all());
+        $response = Http::timeout(30)
+            ->withoutVerifying()
+            ->withToken($token)
+            ->acceptJson()
+            ->post(getBackendUrl('/api/berita'), $request->all());
         
         if ($response->successful()) {
             return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil diinput');
