@@ -15,15 +15,15 @@ class BeritaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'judul' => 'required|string',
             'link' => 'required|url',
             'sumber' => 'nullable|string',
             'gambar' => 'nullable|string',
             'deskripsi' => 'nullable|string',
         ]);
-
-        $berita = Berita::create($request->all());
+ 
+        $berita = Berita::create($validated);
         return response()->json($berita, 201);
     }
 
@@ -34,13 +34,13 @@ class BeritaController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'judul' => 'required|string',
             'link' => 'required|url',
         ]);
-
+ 
         $berita = Berita::findOrFail($id);
-        $berita->update($request->all());
+        $berita->update($validated);
         return response()->json($berita);
     }
 

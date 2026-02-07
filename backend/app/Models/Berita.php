@@ -6,5 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Berita extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'judul',
+        'link',
+        'sumber',
+        'gambar',
+        'kategori',
+        'deskripsi',
+    ];
 }
