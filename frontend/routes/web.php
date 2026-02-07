@@ -32,6 +32,23 @@ Route::get('/debug-api', function() {
     }
 });
 
+// -- Proxy Route for Client-side AJAX (Avoid CORS & SSL issues) --
+Route::get('/api-proxy/warga/check', function(Request $request) {
+    $nik = $request->query('nik');
+    try {
+        $response = Http::timeout(10)
+            ->withoutVerifying()
+            ->get(getBackendUrl('/api/warga/check'), ['nik' => $nik]);
+        
+        return response()->json($response->json(), $response->status());
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Proxy error: ' . $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::get('/', function () {
     return view('welcome');
 });

@@ -102,8 +102,7 @@
         statusText.innerHTML = '<span class="text-emerald-600 animate-pulse">Sedang mengecek data...</span>';
         
         try {
-            const baseUrl = '{{ rtrim(env('BACKEND_URL', 'http://127.0.0.1:8000'), '/') }}';
-            const response = await axios.get(baseUrl + '/api/warga/check?nik=' + nik);
+            const response = await axios.get('/api-proxy/warga/check?nik=' + nik);
             const warga = response.data.data;
 
             document.getElementById('namaWarga').value = warga?.nama_lengkap ?? '';
